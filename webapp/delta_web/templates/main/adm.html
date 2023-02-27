@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>{{ title }}</title>
+</head>
+<body>
+<h1>{{ title }}</h1>
+
+<p><a href="/admin">Admin</a></p>
+<p><a href="/update_catalog">Update Catalogs</a></p>
+<p><a href="/">Main page</a></p>
+<p>--------------------</p>
+<p>IP: {{ ip }}</p>
+<p>Посетителей          : {{ count }}</p>
+<p>Всего посещений сайта: {{ total_visits }}</p>
+{% for v in visitors %}
+    <p>IP: {{ v.ip }} | count: {{ v.count }} | last_visit: {{ v.last_visit }}</p>
+    <p>-----------------------------------------------------------------</p>
+{% endfor %}
+
+
+</body>
+</html>

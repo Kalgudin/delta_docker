@@ -1,0 +1,76 @@
+{% extends 'main/base.html' %}
+
+{% block title %}
+{{ title }}
+{% endblock %}
+
+{% block top %}
+
+<h1>Best Sale from Wildberries</h1>
+<form action="{% url 'index' %}" method="post" class="raw">
+    {% csrf_token %}
+    {{ form }}
+    <button type="submit">search</button>
+</form>
+
+{% endblock %}
+
+{% block left %}
+<div class="sab_category">
+ <h3 class="top cat_button"><a href="/category/{{ base_cat.parent }}">{{ parent_cat }}</a></h3>
+ <h4 class="this cat_button"><a href="/category/{{ base_cat.id }}">{{ base_cat.name }}</a></h4>
+{% for cat in category %}
+ <p><a href="/category/{{ cat.id }}">{{ cat.name }}</a>{{ cat.total_views }}</p>
+{%endfor%}
+</div>
+{% endblock %}
+
+{% block center %}
+<div class="products">
+ <h6>Товары</h6>
+
+{% for prod in products %}
+ <div class="prod">
+
+ <p><a href="{{ p.url }}" class="prod_name">{{ prod.name | upper }}</a></p>
+
+  <p class="prod_price">{% widthratio prod.sale_price 100 1 %}(руб.)</p>
+
+  <p class="prod_sale">{{ prod.sale }}%</p>
+ </div>
+{%endfor%}
+</div>
+{% endblock %}
+
+{% block right %}
+
+    {% if is_paginated %}
+    <div class="pagination">
+        <span class="page-links">
+            {% if page_obj.has_previous %}
+                <a href="/products?page={{ page_obj.previous_page_number }}">previous</a>
+            {% endif %}
+            <span class="page-current">
+                Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}.
+            </span>
+            {% if page_obj.has_next %}
+                <a href="/products?page={{ page_obj.next_page_number }}">next</a>
+            {% endif %}
+        </span>
+    </div>
+    {% endif %}
+####################################
+
+{% if page_obj.has_other_pages %}
+<nav class="list-pages">
+    <ul>
+        {% for p in paginator.page_range %}
+        <li class="page-num">
+            <a href="?page={{ p }}">{{ p }}</a>
+        </li>
+        {% endfor %}
+    </ul>
+</nav>
+{% endif %}
+
+{% endblock %}
