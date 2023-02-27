@@ -6,6 +6,7 @@ from .category_def import *
 from .proucts_def import *
 from .forms import *
 
+
 def index(request):
     context = {'title': 'Main page', 'description': 'Some Description'}
     return render(request, 'main/index.html', context)

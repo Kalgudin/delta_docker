@@ -156,17 +156,18 @@ INTERNAL_IPS = [
 #  C:\Users\User\PycharmProjects\delta_docker\venv\Scripts\activate
 #  cd C:\Users\User\PycharmProjects\delta_docker\webapp\delta_web
 #  python manage.py runserver
+
+# docker-compose up --build
+
+
+
 ########################################## DB mySQL   u1897288_nick-ka /// xz*   72055049   139839921
 ###  source /home/nick_ka/'Рабочий стол'/Django_projects/django_venv/bin/activate
 #  source /home/nick_ka/'Рабочий стол'/Django_projects/delta_web/venv/bin/activate
 #  python3 manage.py runserver
 
 
-#TODO сменить БД
-#счетчек посетителей
-#Пермишены
-#TODO выбор минимальной скидки
-#скорректировать под мобильную версию
+
 
 
 
