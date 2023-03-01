@@ -79,15 +79,15 @@ WSGI_APPLICATION = 'delta_web.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'delta',
-        'USER': 'delta_admin',
-        'PASSWORD': 'Xzxz0011*',
-        'HOST': 'localhost',
-        'PORT': '',
+        # 'ENGINE': 'django.db.backends.postgresql',
+        # 'NAME': 'delta',
+        # 'USER': 'delta_admin',
+        # 'PASSWORD': 'Xzxz0011*',
+        # 'HOST': 'localhost',
+        # 'PORT': '',
 
-        # 'ENGINE': 'django.db.backends.sqlite3',
-        # 'NAME': BASE_DIR / 'db.sqlite3',
+        'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': BASE_DIR / 'db.sqlite3',
 
         # 'ENGINE': 'django.db.backends.mysql',
         # 'NAME': 'u1897288_default',

@@ -77,6 +77,4 @@ except Exception as ex:
     CAT_PAGES = 4
     CACHE_TIME = 60
 
-print('in MODELS')
-
 
