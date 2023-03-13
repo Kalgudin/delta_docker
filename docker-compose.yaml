@@ -1,22 +1,45 @@
-version: "3.11"
+version: "3"
 
 services:
   redis:
-    image: redis
+    image: redis:alpine
     restart: always
 
   webapp:
     restart: always
-    build:
-      context: ./webapp
+    build: ./webapp
+    command: python src/manage.py runserver 0.0.0.0:8000
+    volumes:
+      - ./webapp/:/webapp/
     ports:
       - "8000:8000"
-    command: [ "python3", "./src/manage.py", "runserver", "0.0.0.0:8000"]
+    env_file:
+      - webapp/src/.env
+    depends_on:
+      - db
+      - redis
 
-#  worker:
-#    restart: always
-#    build:
-#      context: ./webapp
-#    volumes:
-#      - ./cats:/app/src/cats
-#    command: ['celery', '--workdir=./src', '-A', 'delta_web', 'worker' ]
+  db:
+    restart: always
+    image: postgres:15.0
+    volumes:
+      - postgres_data:/var/lib/postgresql/data/
+    env_file:
+      - webapp/src/.env
+    depends_on:
+      - redis
+
+  worker:
+    restart: always
+    build:
+      context: ./webapp
+    volumes:
+      - ./delta:/app/src/delta
+    command: ['celery', '--workdir=./src', '-A', 'delta_web', 'worker', '-B', '-E' ]
+    depends_on:
+      - db
+      - redis
+
+
+volumes:
+  postgres_data:

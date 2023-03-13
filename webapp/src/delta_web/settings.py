@@ -10,7 +10,11 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/4.1/ref/settings/
 """
 import os
+
+from celery.schedules import crontab
+from dotenv import load_dotenv
 from pathlib import Path
+
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -20,13 +24,20 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/4.1/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-7z#^o)lypdxnl3lf4y74moaybopumaifmc=s0z2jjd5t55g1+-'
+# SECRET_KEY = 'django-insecure-7z#^o)lypdxnl3lf4y74moaybopumaifmc=s0z2jjd5t55g1+-'
+#
+# # SECURITY WARNING: don't run with debug turned on in production!
+# DEBUG = True
+#
+# ALLOWED_HOSTS = ['www.mpdis.ru', '.mpdis.ru', 'http://mpdis.ru', '127.0.0.1', 'localhost']
 
-# SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
 
-ALLOWED_HOSTS = ['www.mpdis.ru', '.mpdis.ru', 'http://mpdis.ru', '127.0.0.1']
-
+load_dotenv()
+SECRET_KEY = os.environ.get("SECRET_KEY")
+DEBUG = int(os.environ.get("DEBUG", default=0))
+# 'DJANGO_ALLOWED_HOSTS' должен быть в виде одной строки с хостами разделенными символом пробела
+# Для примера: 'DJANGO_ALLOWED_HOSTS=localhost 127.0.0.1 [::1]'
+ALLOWED_HOSTS = os.environ.get("DJANGO_ALLOWED_HOSTS").split(' ')
 
 # Application definition
 
@@ -40,6 +51,7 @@ INSTALLED_APPS = [
     # 'debug_toolbar',
 
     'delta.apps.DeltaConfig',
+    'django_celery_beat',
 ]
 
 MIDDLEWARE = [
@@ -79,6 +91,14 @@ WSGI_APPLICATION = 'delta_web.wsgi.application'
 
 DATABASES = {
     'default': {
+
+        "ENGINE": os.environ.get("SQL_ENGINE", "django.db.backends.sqlite3"),
+        "NAME": os.environ.get("SQL_DATABASE", os.path.join(BASE_DIR, "db.sqlite3")),
+        "USER": os.environ.get("SQL_USER", ""),
+        "PASSWORD": os.environ.get("SQL_PASSWORD", ""),
+        "HOST": os.environ.get("SQL_HOST", "localhost"),
+        "PORT": os.environ.get("SQL_PORT", "5432"),
+
         # 'ENGINE': 'django.db.backends.postgresql',
         # 'NAME': 'delta',
         # 'USER': 'delta_admin',
@@ -86,8 +106,8 @@ DATABASES = {
         # 'HOST': 'localhost',
         # 'PORT': '',
 
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+        # 'ENGINE': 'django.db.backends.sqlite3',
+        # 'NAME': BASE_DIR / 'db.sqlite3',
 
         # 'ENGINE': 'django.db.backends.mysql',
         # 'NAME': 'u1897288_default',
@@ -152,6 +172,22 @@ INTERNAL_IPS = [
     '127.0.0.1',
 ]
 
+########### CELERY - REDIS ################
+CELERY_BROKER_URL = "redis://redis:6379"
+CELERY_RESULT_BACKEND = "redis://redis:6379"
+
+CELERY_ACCEPT_CONTENT = ["application/json"]
+CELERY_TASK_SERIALIZER = "json"
+CELERY_RESULT_SERIALIZER = "json"
+
+# CELERY_BEAT_SCHEDULE = {
+#     "update_goods": {
+#         "task": "delta.tasks.regular_update_products",
+#         "schedule": crontab(minute=0, hour=3),
+#         "args": ("my args in SETTINGS - minute=0, hour=3",),
+#     },
+# }
+###########################################
 
 #  C:\Users\User\PycharmProjects\delta_docker\venv\Scripts\activate
 #  cd C:\Users\User\PycharmProjects\delta_docker\webapp\delta_web

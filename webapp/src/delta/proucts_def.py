@@ -104,8 +104,10 @@ def _get_product_from_json_for_db(data_js, cat):
     # print(f'count prods = {len(prod_list)}')
 
 
-
 def _start_thread(shard, query, cat, start_page, end_page):
+    updated_cat = Category.objects.get(id=cat)
+    updated_cat.updated_at = datetime.now().timestamp()
+    updated_cat.save()
     for page in range(start_page, end_page+1):
         headers = {'Accept': "*/*"}
         # print(f'Сбор позиций со страницы {page} из {end_page}')
@@ -116,7 +118,7 @@ def _start_thread(shard, query, cat, start_page, end_page):
             data_js = r.json()
             _get_product_from_json_for_db(data_js=data_js, cat=cat)
         except Exception as ex:
-            print(f'----Error----{ex}  / in _start_thread / -------requests --- {r}')
+            print(f'----Error----{ex}  / in _start_thread /')  # -------requests --- {r}')
             break
 
 
@@ -124,7 +126,7 @@ def _start_thread(shard, query, cat, start_page, end_page):
 # @dramatiq.actor
 
 def get_product_for_db(shard, query, cat):
-    # print(CAT_PAGES)
+    print(f'****  Update Category - {cat}  ****')
     if CAT_PAGES >= 4:  # Запускаем в 4 потока(думаю,больше не стоит)
         n = round(CAT_PAGES / 4)
         tr1 = Thread(target=_start_thread, daemon=True, kwargs=dict(shard=shard, query=query, cat=cat,

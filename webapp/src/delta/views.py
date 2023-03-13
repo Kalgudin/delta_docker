@@ -5,6 +5,7 @@ from django.core.cache import cache
 from .category_def import *
 from .proucts_def import *
 from .forms import *
+from . import tasks
 
 
 def index(request):
@@ -62,7 +63,6 @@ class ViewProducts(generic.ListView):
     context_object_name = 'products'
 
     def get_context_data(self, *args, **kwargs):
-
         context = super().get_context_data(**kwargs)
         context["title"] = 'Delta'
         context["form"] = SearchForm()
@@ -78,6 +78,7 @@ class ViewProducts(generic.ListView):
             context["title"] = base_category.name
         else:
             # Добавляем счетчик посетителей ###################################
+            #TODO rebase in TASK
             ip = get_client_ip(self.request)
             vis, created = Visitors.objects.get_or_create(ip=ip)
             vis.count += 1
@@ -97,6 +98,7 @@ class ViewProducts(generic.ListView):
             ##################################################################
             context["category"] = cache.get_or_set('all_category',
                     Category.objects.filter(parent_cat=None).order_by('-total_views').only('id', 'name'), CACHE_TIME)
+            # print(context)
         return context
 
     def get_queryset(self, **kwargs):
@@ -106,20 +108,15 @@ class ViewProducts(generic.ListView):
                                                                                                 'sale_price', 'sale')
             cat = Category.objects.get(id=cat_id)
             cat.counter()
-            pora_obnovlyat = (datetime.now().timestamp() > (cat.updated_at + (60 * 60 * 24)))  # Раз в сутки
-            if pora_obnovlyat: self._cat_apdate(cat)
+            pora_obnovlyat = (datetime.now().timestamp() > (cat.updated_at + (60 * 60 * 12)))  # Раз в 12 часов
+            if pora_obnovlyat:
+                # Start Task ################ #TODO надо поставить этой задаче высший приоритет
+                tasks.task_get_product_for_db.delay(shard=cat.shard, query=cat.query, cat=self.kwargs["id"])
+                #############################
         else:
             q_set = cache.get_or_set('q_set', Product.objects.filter(sale__gte=MIN_SALE).order_by('-sale').only('url',
                                                                             'name', 'sale_price', 'sale'), CACHE_TIME)
         return q_set
-
-    def _cat_apdate(self, cat):
-        cat.updated_at = datetime.now().timestamp()
-        cat.save()
-        print(f'***********  Update Category - {cat}  ***************self.kwargs["id"]*****{self.kwargs["id"]}')
-        t1 = Thread(target=get_product_for_db, daemon=True,
-                    kwargs=dict(shard=cat.shard, query=cat.query, cat=self.kwargs["id"]))
-        t1.start()  # Вроде работает
 
 
 class ViewSearchProducts(generic.ListView):
