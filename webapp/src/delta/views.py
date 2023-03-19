@@ -78,12 +78,8 @@ class ViewProducts(generic.ListView):
             context["title"] = base_category.name
         else:
             # Добавляем счетчик посетителей ###################################
-            #TODO rebase in TASK
             ip = get_client_ip(self.request)
-            vis, created = Visitors.objects.get_or_create(ip=ip)
-            vis.count += 1
-            vis.last_visit = datetime.now().timestamp()
-            vis.save()
+            tasks.task_visit_counter.delay(ip=ip)
             # Сохраняем констнты ##############################################
             try:
                 MIN_SALE = Constants.objects.first().sale  # размер минимальной скидки отображаемого товара на странице
@@ -108,9 +104,9 @@ class ViewProducts(generic.ListView):
                                                                                                 'sale_price', 'sale')
             cat = Category.objects.get(id=cat_id)
             cat.counter()
-            pora_obnovlyat = (datetime.now().timestamp() > (cat.updated_at + (60 * 60 * 12)))  # Раз в 12 часов
+            pora_obnovlyat = (datetime.now().timestamp() > (cat.updated_at + (60 * 60 * 24)))  # Раз в сутки
             if pora_obnovlyat:
-                # Start Task ################ #TODO надо поставить этой задаче высший приоритет
+                # Start Task ################
                 tasks.task_get_product_for_db.delay(shard=cat.shard, query=cat.query, cat=self.kwargs["id"])
                 #############################
         else:

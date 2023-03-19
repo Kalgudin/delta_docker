@@ -35,7 +35,7 @@ services:
       context: ./webapp
     volumes:
       - ./delta:/app/src/delta
-    command: ['celery', '--workdir=./src', '-A', 'delta_web', 'worker', '-B', '-E' ]
+    command: ['celery', '--workdir=./src', '-A', 'delta_web', 'worker', '-B', '-E']
     depends_on:
       - db
       - redis

@@ -11,26 +11,12 @@ https://docs.djangoproject.com/en/4.1/ref/settings/
 """
 import os
 
-from celery.schedules import crontab
+# from celery.schedules import crontab
+
 from dotenv import load_dotenv
 from pathlib import Path
 
-
-# Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
-
-
-# Quick-start development settings - unsuitable for production
-# See https://docs.djangoproject.com/en/4.1/howto/deployment/checklist/
-
-# SECURITY WARNING: keep the secret key used in production secret!
-# SECRET_KEY = 'django-insecure-7z#^o)lypdxnl3lf4y74moaybopumaifmc=s0z2jjd5t55g1+-'
-#
-# # SECURITY WARNING: don't run with debug turned on in production!
-# DEBUG = True
-#
-# ALLOWED_HOSTS = ['www.mpdis.ru', '.mpdis.ru', 'http://mpdis.ru', '127.0.0.1', 'localhost']
-
 
 load_dotenv()
 SECRET_KEY = os.environ.get("SECRET_KEY")
@@ -85,10 +71,6 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'delta_web.wsgi.application'
 
-
-# Database
-# https://docs.djangoproject.com/en/4.1/ref/settings/#databases
-
 DATABASES = {
     'default': {
 
@@ -98,27 +80,8 @@ DATABASES = {
         "PASSWORD": os.environ.get("SQL_PASSWORD", ""),
         "HOST": os.environ.get("SQL_HOST", "localhost"),
         "PORT": os.environ.get("SQL_PORT", "5432"),
-
-        # 'ENGINE': 'django.db.backends.postgresql',
-        # 'NAME': 'delta',
-        # 'USER': 'delta_admin',
-        # 'PASSWORD': 'Xzxz0011*',
-        # 'HOST': 'localhost',
-        # 'PORT': '',
-
-        # 'ENGINE': 'django.db.backends.sqlite3',
-        # 'NAME': BASE_DIR / 'db.sqlite3',
-
-        # 'ENGINE': 'django.db.backends.mysql',
-        # 'NAME': 'u1897288_default',
-        # 'USER': 'u1897288_default',
-        # 'PASSWORD': 'H63MfrNPqehHe86Y',
-        # 'HOST': 'localhost',
     }
 }
-
-# Password validation
-# https://docs.djangoproject.com/en/4.1/ref/settings/#auth-password-validators
 
 AUTH_PASSWORD_VALIDATORS = [
     {
@@ -135,10 +98,6 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
-
-# Internationalization
-# https://docs.djangoproject.com/en/4.1/topics/i18n/
-
 LANGUAGE_CODE = 'ru'
 
 TIME_ZONE = 'Europe/Moscow'
@@ -147,18 +106,11 @@ USE_I18N = True
 
 USE_TZ = True
 
-
-# Static files (CSS, JavaScript, Images)
-# https://docs.djangoproject.com/en/4.1/howto/static-files/
-
 STATICFILES_DIRS = [os.path.join(BASE_DIR, "static")]
 STATIC_URL = '/static/'
 LOGIN_REDIRECT_URL = '/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media/')
 MEDIA_URL = '/media/'
-
-# Default primary key field type
-# https://docs.djangoproject.com/en/4.1/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
@@ -180,27 +132,17 @@ CELERY_ACCEPT_CONTENT = ["application/json"]
 CELERY_TASK_SERIALIZER = "json"
 CELERY_RESULT_SERIALIZER = "json"
 
+
 # CELERY_BEAT_SCHEDULE = {
 #     "update_goods": {
 #         "task": "delta.tasks.regular_update_products",
 #         "schedule": crontab(minute=0, hour=3),
-#         "args": ("my args in SETTINGS - minute=0, hour=3",),
+#         "args": ("my args in SETTINGS - minute=0, hour=16",),
 #     },
 # }
 ###########################################
 
-#  C:\Users\User\PycharmProjects\delta_docker\venv\Scripts\activate
-#  cd C:\Users\User\PycharmProjects\delta_docker\webapp\delta_web
-#  python manage.py runserver
-
 # docker-compose up --build
-
-
-
-########################################## DB mySQL   u1897288_nick-ka /// xz*   72055049   139839921
-###  source /home/nick_ka/'Рабочий стол'/Django_projects/django_venv/bin/activate
-#  source /home/nick_ka/'Рабочий стол'/Django_projects/delta_web/venv/bin/activate
-#  python3 manage.py runserver
 
 
 

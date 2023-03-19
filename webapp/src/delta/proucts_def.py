@@ -61,14 +61,9 @@ def _get_cat_list(cat_id, cat_list):
 def _product_to_db(prod_db, prod_json, cat, priceU):
     average_price, real_sale, all_prices = get_average_price(id=prod_json['id'],
                                                              price=priceU, all_prices=prod_db.all_prices)
-
-    # if not prod_db.name:  # Новый продукт
-    #     print(f'******* PRODUCT Created  {prod_json["name"]}, ID - {prod_json["id"]} ******** {real_sale} % ******* ')
-    # else:
-    #     print(f'******* PRODUCT  Edited {prod_json["name"]}, ID - {prod_json["id"]} ******* {real_sale} % ******** ')
-
-    import re
+    import re  #### убераем смайлики #########
     prod_db.name = re.compile('[^a-zA-Z0-9а-яА-Я ]').sub('', prod_json["name"])
+    ##########################################
     # prod_db.name = prod_json["name"]
     prod_db.base_price = int(prod_json["priceU"])
     prod_db.sale_price = int(prod_json["salePriceU"])
@@ -126,17 +121,17 @@ def _start_thread(shard, query, cat, start_page, end_page):
 # @dramatiq.actor
 
 def get_product_for_db(shard, query, cat):
-    print(f'****  Update Category - {cat}  ****')
+    # print(f'****  Update Category - {cat}  ****')
     if CAT_PAGES >= 4:  # Запускаем в 4 потока(думаю,больше не стоит)
         n = round(CAT_PAGES / 4)
         tr1 = Thread(target=_start_thread, daemon=True, kwargs=dict(shard=shard, query=query, cat=cat,
-                                                              start_page=1, end_page=n))
+                                                                    start_page=1, end_page=n))
         tr2 = Thread(target=_start_thread, daemon=True, kwargs=dict(shard=shard, query=query, cat=cat,
-                                                              start_page=n+1, end_page=2*n))
+                                                                    start_page=n+1, end_page=2*n))
         tr3 = Thread(target=_start_thread, daemon=True, kwargs=dict(shard=shard, query=query, cat=cat,
-                                                              start_page=2*n+1, end_page=3*n))
+                                                                    start_page=2*n+1, end_page=3*n))
         tr4 = Thread(target=_start_thread, daemon=True, kwargs=dict(shard=shard, query=query, cat=cat,
-                                                              start_page=3*n+1, end_page=CAT_PAGES))
+                                                                    start_page=3*n+1, end_page=CAT_PAGES))
         tr1.start()
         tr2.start()
         tr3.start()
@@ -146,11 +141,10 @@ def get_product_for_db(shard, query, cat):
         tr3.join()
         tr4.join()
     else:
-        tr1 = Thread(target=_start_thread, daemon=True, kwargs=dict(shard=shard, query=query, cat=cat,
-                                                              start_page=1, end_page=CAT_PAGES))
-        tr1.start()
-        tr1.join()
-
+        tr = Thread(target=_start_thread, daemon=True, kwargs=dict(shard=shard, query=query, cat=cat,
+                                                                   start_page=1, end_page=CAT_PAGES))
+        tr.start()
+        tr.join()
 
 
 
